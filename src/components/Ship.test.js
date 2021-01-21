@@ -1,4 +1,3 @@
-import { queryByTestId } from '@testing-library/react';
 import Ship from './Ship';
 
 const testShip = Ship('testShip', 4);
