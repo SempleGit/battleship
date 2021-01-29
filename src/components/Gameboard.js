@@ -7,7 +7,7 @@ const Gameboard = () => {
   let axis = 'horizontal';
 
   const getGameboard = () => gameboard;
-  const getDisplayBoard = (x) => displayBoard[x];
+  const getDisplayBoard = () => displayBoard;
   const setAxis = (direction) => {
     axis = direction;
   }
@@ -64,6 +64,7 @@ const Gameboard = () => {
 
   const receiveAttack = (x) => {
     // check if ship at x coordinate.
+    x = Number(x);
     if(openAttackPositions.has(x)) { //checks if this position has been selected yet.
       openAttackPositions.delete(x); //removes from possible attack positions and proceeds to check if ship is there
       if(gameboard[x]) { //check if ship in location
