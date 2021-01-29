@@ -1,12 +1,13 @@
-
-
 const Gameboard = () => {
   const boardSize = 10;
   const gameboard = Array.from({length: boardSize**2});
-  const attackPositions = new Set(Array.from({length: boardSize**2}).map((i, index) => index));
+  const displayBoard = Array.from({length: boardSize**2}).map( () => 'open');
+  const openAttackPositions = new Set(Array.from({length: boardSize**2}).map((i, index) => index));
+  const activeShips = new Set();
   let axis = 'horizontal';
 
   const getGameboard = () => gameboard;
+  const getDisplayBoard = (x) => displayBoard[x];
   const setAxis = (direction) => {
     axis = direction;
   }
@@ -16,6 +17,7 @@ const Gameboard = () => {
     if (validateLocation(ship, startLocation)) { // validate location is acceptable;
       for (let i = 0; i < ship.getLength(); i++) {
         gameboard[startLocation + i * placeAxis] = {ship, name: ship.getName(), hitbox: i};
+        activeShips.add(ship);
       }
       return true;
     } 
@@ -56,21 +58,30 @@ const Gameboard = () => {
     return true;
   }
 
+  const allShipsSunk = () => {
+    return activeShips.size === 0;
+  }
+
   const receiveAttack = (x) => {
     // check if ship at x coordinate.
-    if(attackPositions.has(x)) { //checks if this position has been selected yet.
-      attackPositions.delete(x); //removes from options and proceeds to check if ship is there
+    if(openAttackPositions.has(x)) { //checks if this position has been selected yet.
+      openAttackPositions.delete(x); //removes from possible attack positions and proceeds to check if ship is there
       if(gameboard[x]) { //check if ship in location
-        gameboard[x].ship.hit(gameboard[x].hitbox);
+        if(gameboard[x].ship.hit(gameboard[x].hitbox)) {
+          activeShips.delete(gameboard[x].ship); // the hit method returns true if the ship is sunk, so this will remove it from the activeShips.
+        };
+        displayBoard[x] = 'hit';
         return `hit ${gameboard[x].ship.getName()}`;
       } else {
+        displayBoard[x] = 'miss';
         return 'miss';
       }
     } else {
       return false;
     }
   }
-  return {receiveAttack, placeShip, setAxis, getGameboard};
+
+  return {receiveAttack, placeShip, setAxis, getGameboard, getDisplayBoard, allShipsSunk};
 }
 
 export default Gameboard;
